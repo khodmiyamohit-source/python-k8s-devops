@@ -16,10 +16,27 @@ pipeline {
             }
         }
 
+        stage('DockerHub Login') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
+                    )
+                ]) {
+                    bat 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%'
+                }
+            }
+        }
+
         stage('DockerHub Push') {
             steps {
                 bat 'docker tag python-k8s-devops:%BUILD_NUMBER% mohitdevops74/python-k8s-devops:%BUILD_NUMBER%'
+                bat 'docker tag python-k8s-devops:%BUILD_NUMBER% mohitdevops74/python-k8s-devops:latest'
+
                 bat 'docker push mohitdevops74/python-k8s-devops:%BUILD_NUMBER%'
+                bat 'docker push mohitdevops74/python-k8s-devops:latest'
             }
         }
 
