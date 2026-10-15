@@ -16,20 +16,7 @@ pipeline {
             }
         }
 
-        stage('DockerHub Login') {
-            steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'dockerhub-credentials',
-                        usernameVariable: 'DOCKER_USERNAME',
-                        passwordVariable: 'DOCKER_PASSWORD'
-                    )
-                ]) {
-                    bat 'docker login -u "%DOCKER_USERNAME%" --password-stdin < NUL'
-                }
-            }
-        }
-
+       
         stage('DockerHub Push') {
             steps {
                 bat 'docker tag python-k8s-devops:%BUILD_NUMBER% mohitdevops74/python-k8s-devops:%BUILD_NUMBER%'
