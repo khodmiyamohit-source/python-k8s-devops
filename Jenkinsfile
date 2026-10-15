@@ -25,7 +25,7 @@ pipeline {
                         passwordVariable: 'DOCKER_PASSWORD'
                     )
                 ]) {
-                    bat 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%'
+                    bat 'docker login -u "%DOCKER_USERNAME%" --password-stdin < NUL'
                 }
             }
         }
@@ -40,11 +40,29 @@ pipeline {
             }
         }
 
+        stage('Kubernetes Check') {
+            steps {
+                bat 'where kubectl'
+                bat 'kubectl config current-context'
+                bat 'kubectl get nodes'
+            }
+        }
+
         stage('Kubernetes Deploy') {
             steps {
                 bat 'kubectl apply -f k8s/deployment.yaml'
                 bat 'kubectl apply -f k8s/service.yaml'
+                bat 'kubectl rollout status deployment/python-k8s-devops --timeout=120s'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check the Console Output for the failing stage.'
         }
     }
 }
