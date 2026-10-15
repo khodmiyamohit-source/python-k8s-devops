@@ -26,23 +26,27 @@ pipeline {
                 bat 'docker push mohitdevops74/python-k8s-devops:latest'
             }
         }
+        
 
         stage('Kubernetes Check') {
             steps {
-                bat 'where kubectl'
+                withEnv(['KUBECONFIG=C:\\Users\\MOHIT\\.kube\\config']) {
                 bat 'kubectl config current-context'
                 bat 'kubectl get nodes'
-            }
         }
+    }
+}
 
         stage('Kubernetes Deploy') {
             steps {
+                withEnv(['KUBECONFIG=C:\\Users\\MOHIT\\.kube\\config']) {
                 bat 'kubectl apply -f k8s/deployment.yaml'
                 bat 'kubectl apply -f k8s/service.yaml'
                 bat 'kubectl rollout status deployment/python-k8s-devops --timeout=120s'
-            }
         }
     }
+}
+
 
     post {
         success {
